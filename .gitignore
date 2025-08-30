@@ -1,0 +1,44 @@
+alxvenv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Environment variables
+.env
+*.env
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# IDE/Editor
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
