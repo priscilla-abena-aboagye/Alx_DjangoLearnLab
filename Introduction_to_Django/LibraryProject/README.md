@@ -14,7 +14,11 @@ title = models.CharField(max_length=200)
 python manage.py makemigrations
 python manage.py migrate
 ```
-- open the shell to intaeract with the database
+- open the shell to interact with the database
 ```python 
 python manage.py shell
+```
+- created a requirement.txt file
+```python 
+pip freeze > requirement.txt
 ```
