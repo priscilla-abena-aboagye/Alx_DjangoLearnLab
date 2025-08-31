@@ -22,3 +22,13 @@ python manage.py shell
 ```python 
 pip freeze > requirement.txt
 ```
+- created a super user for the admin panel 
+```python 
+python manage.py createsuperuser
+```
+
+- registered the models 
+```python
+admin.site.register(Book)
+```
+
