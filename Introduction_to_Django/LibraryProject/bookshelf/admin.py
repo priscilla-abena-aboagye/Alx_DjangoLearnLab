@@ -5,7 +5,7 @@ admin.site.register(Book)
 
 # Register your models here.
 
-class BookAdmin():
+class BookAdmin(admin.ModelAdmin):
     list_display = ("title", "author", "publication_year")
     list_filter = ("publication_year", "author")
     search_feild = ("title", "author")
