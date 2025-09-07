@@ -14,9 +14,10 @@ for book in books_by_author:
 
 
 # List all books in a library.
-library = Library.objects.get(name='End of the tunnel')
+library_name = "Accra Central Library"
+library = Library.objects.get(name=library_name)
 for book in library.books.all():
-    print(book.name)
+    print(book)
 
 # Retrieve the librarian for a library.
 librarian = Librarian.objects.get(library=library)
