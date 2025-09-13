@@ -82,5 +82,5 @@ def delete_book(request, pk):
     if request.method == 'POST':
         book.delete()
         return redirect('list_books')
-    return render(request, 'relationship_app/book_confirm_delete.html', {'book': book})
+    return render(request, 'relationship_app/book_confirm.html', {'book': book})
     
