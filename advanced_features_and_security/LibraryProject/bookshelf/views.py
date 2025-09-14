@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book
-from .form import BookForm
+from .forms import BookForm
 
 # Create your views here.
 # can view books
