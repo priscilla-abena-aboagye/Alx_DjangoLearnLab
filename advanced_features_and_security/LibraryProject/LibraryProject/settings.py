@@ -27,9 +27,9 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = 'django-insecure-r1w&j^v_)0_20ih_ym1$b1oo(#y23&c=ftuhxvyu_qr#&yxm1_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False # Prevents exposing sensitive info
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -53,7 +53,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "csp.middleware.CSPMiddleware",
 ]
+
+CSP_DEFAULT_SRC = ("'self'",)  # only allow content from your own site
+CSP_STYLE_SRC = ("'self'", "https://fonts.googleapis.com")
+CSP_SCRIPT_SRC = ("'self'",)
 
 ROOT_URLCONF = 'LibraryProject.urls'
 
@@ -139,6 +144,12 @@ AUTH_USER_MODEL = 'bookshelf.CustomUser'
 MEDIA_URL = '/images/'
 MEDIA_ROOT = BASE_DIR / "images"
 
+SECURE_BROWSER_XSS_FILTER = True 
+X_FRAME_OPTIONS = "DENY"          
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+CSRF_COOKIE_SECURE = True  
+SESSION_COOKIE_SECURE = True
 
 
 
