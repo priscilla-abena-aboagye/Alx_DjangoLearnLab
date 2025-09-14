@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book
-from .forms import BookForm
+from .forms import ExampleForm
 
 # Create your views here.
 # can view books
@@ -16,12 +16,12 @@ def book_list(request):
 @permission_required('bookshelf.can_add_book', raise_exception=True)
 def add_book(request):
     if request.method == 'POST':
-        form = BookForm(request.POST)
+        form = ExampleForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('list_books')
     else:
-        form = BookForm()
+        form = ExampleForm()
     return render(request, 'bookshelf/book_form.html', {'form': form})
 
 # can edit books
@@ -29,12 +29,12 @@ def add_book(request):
 def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
+        form = ExampleForm(request.POST, instance=book)
         if form.is_valid():
             form.save()
             return redirect('list_books')
     else:
-        form = BookForm(instance=book)
+        form = ExampleForm(instance=book)
     return render(request, 'bookshelf/book_form.html', {'form': form})
 
 # can delete books
