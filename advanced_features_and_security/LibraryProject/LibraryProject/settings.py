@@ -163,5 +163,8 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Allow browser preload list (extra strict security)
 SECURE_HSTS_PRELOAD = True  
 
+# Tell Django it’s behind a proxy that sets X-Forwarded-Proto
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 
 
