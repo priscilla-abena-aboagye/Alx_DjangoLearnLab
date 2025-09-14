@@ -7,7 +7,7 @@ from .form import BookForm
 # Create your views here.
 # can view books
 @permission_required('bookshelf.can_view_book', raise_exception=True)
-def list_books(request):
+def book_list(request):
     books = Book.objects.all()
     return render(request, "bookshelf/list_books.html", {"books": books})
 
