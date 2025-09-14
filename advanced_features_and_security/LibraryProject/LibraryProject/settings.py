@@ -151,5 +151,17 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 CSRF_COOKIE_SECURE = True  
 SESSION_COOKIE_SECURE = True
 
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True  
+
+# Tell browsers to always use HTTPS for your site (1 year = 31536000 seconds)
+SECURE_HSTS_SECONDS = 31536000  
+
+# Apply HSTS to all subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  
+
+# Allow browser preload list (extra strict security)
+SECURE_HSTS_PRELOAD = True  
+
 
 
