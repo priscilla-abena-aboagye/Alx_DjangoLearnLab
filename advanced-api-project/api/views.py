@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import generics, permissions
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from .models import Book
 from .serializers import BookSerializer
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -10,9 +11,9 @@ class BookListCreateAPI(generics.ListCreateAPIView):
 
     # Only users that are authenticated can create, but anyone can list
     def get_permissions(self):
-        if self.request.method == "POST":  # Fix typo: must be uppercase POST
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+        if self.request.method == "POST":  
+            return [IsAuthenticated()]
+        return [AllowAny()]
     
     # Filtering by query parameters
     def get_queryset(self):
@@ -29,8 +30,8 @@ class BookDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     # Only authenticated users can update/delete, anyone can retrieve
     def get_permissions(self):
         if self.request.method in ["PUT", "PATCH", "DELETE"]:
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+            return [IsAuthenticated()]
+        return [AllowAny()]
 
 
 class BookListView(ListView):
