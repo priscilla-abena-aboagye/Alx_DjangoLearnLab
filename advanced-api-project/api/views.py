@@ -1,14 +1,16 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.permissions import AllowAny
 from .models import Book
 from .serializers import BookSerializer
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django_filters import rest_framework as drf_filters
 
 class BookListCreateAPI(generics.ListCreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # Only users that are authenticated can create, but anyone can list
     def get_permissions(self):
@@ -16,23 +18,24 @@ class BookListCreateAPI(generics.ListCreateAPIView):
             return [IsAuthenticated()]
         return [AllowAny()]
     
-    # Filtering by query parameters
-    def get_queryset(self):
-        queryset = Book.objects.all()
-        author_id = self.request.query_params.get('author')
-        if author_id:
-            queryset = queryset.filter(author__id=author_id)
-        return queryset
+    # Filtering , searching and ordering
+    filter_backends = [
+        drf_filters.DjangoFilterBackend,  # filtering
+        filters.SearchFilter,             # searching
+        filters.OrderingFilter            # ordering
+    ]
+
+    filterset_fields = ['title', 'author', 'publication_year']  
+    search_fields = ['title', 'author__name']                  
+    ordering_fields = ['title', 'publication_year']             
+    ordering = ['title']    
     
 class BookDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-    # Only authenticated users can update/delete, anyone can retrieve
-    def get_permissions(self):
-        if self.request.method in ["PUT", "PATCH", "DELETE"]:
-            return [IsAuthenticated()]
-        return [AllowAny()]
+    
 
 
 class BookListView(ListView):
