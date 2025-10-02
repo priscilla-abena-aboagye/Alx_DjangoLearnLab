@@ -16,9 +16,9 @@
         <p>{{ comment.content|linebreaks }}</p>
         <small>By {{ comment.author.username }} — {{ comment.created_at|date:"M d, Y H:i" }}</small>
         {% if user.is_authenticated and user == comment.author %}
-          <!-- Edit / Delete links -->
-          <a href="{% url 'comment-update' comment.pk %}">Edit</a>
-          <a href="{% url 'comment-delete' comment.pk %}">Delete</a>
+  
+          <a href="{% url 'comment-update' pk=post.pk comment_pk=comment.pk %}">Edit</a>
+          <a href="{% url 'comment-delete' pk=post.pk comment_pk=comment.pk %}">Delete</a>
         {% endif %}
       </li>
     {% empty %}
@@ -28,7 +28,8 @@
 {% endif %}
 
 {% if user.is_authenticated %}
-  <p><a href="{% url 'comment-create' post_pk=post.pk %}">Add a comment</a></p>
+  <p><a href="{% url 'comment-create' pk=post.pk %}">Add a Comment</a>
+</p>
 {% else %}
   <p><a href="{% url 'login' %}?next={% url 'post-detail' post.pk %}">Log in</a> to comment.</p>
 {% endif %}

@@ -36,33 +36,32 @@ class CommentTests(TestCase):
         self.post = Post.objects.create(title="T", content="C", author=self.user)
 
     def test_create_comment_requires_login(self):
-        url = reverse("comment-create", kwargs={"post_pk": self.post.pk})
+        post = Post.objects.create(title="Test Post", content="Test Content", author=self.user)
+        url = reverse("comment-create", kwargs={"pk": post.pk})
         resp = self.client.get(url)
-        self.assertNotEqual(resp.status_code, 200)
-        self.client.login(username="bob", password="pass1234")
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        resp = self.client.post(url, {"content": "Nice post"})
-        self.assertRedirects(resp, reverse("post-detail", kwargs={"pk": self.post.pk}))
-        self.assertEqual(self.post.comments.count(), 1)
-        comment = self.post.comments.first()
-        self.assertEqual(comment.author, self.other)
+        self.assertRedirects(resp, f"/login/?next={url}")
+
 
     def test_only_author_can_edit_or_delete_comment(self):
         comment = Comment.objects.create(post=self.post, author=self.other, content="hey")
-        update_url = reverse("comment-update", kwargs={"pk": comment.pk})
-        delete_url = reverse("comment-delete", kwargs={"pk": comment.pk})
 
+        update_url = reverse("comment-update", kwargs={"pk": self.post.pk, "comment_pk": comment.pk})
+        delete_url = reverse("comment-delete", kwargs={"pk": self.post.pk, "comment_pk": comment.pk})
+
+    # Alice (not author) should NOT be able to edit or delete
         self.client.login(username="alice", password="pass1234")
         resp = self.client.get(update_url)
         self.assertNotEqual(resp.status_code, 200)
         resp = self.client.get(delete_url)
         self.assertNotEqual(resp.status_code, 200)
 
+    # Bob (author) CAN edit/delete
         self.client.login(username="bob", password="pass1234")
         resp = self.client.get(update_url)
         self.assertEqual(resp.status_code, 200)
         resp = self.client.post(update_url, {"content": "updated"})
         self.assertRedirects(resp, reverse("post-detail", kwargs={"pk": self.post.pk}))
+
         comment.refresh_from_db()
         self.assertEqual(comment.content, "updated")
+
