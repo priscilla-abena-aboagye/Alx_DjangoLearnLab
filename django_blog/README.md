@@ -19,6 +19,13 @@ It is built using Django’s built-in authentication framework, with some custom
 - Registration
 - login
 - Profile management
+- Blog features
+
+## Blog Features
+- Post
+- Create post
+- Delete post
+- Update post
 
 ### 3.URL structure
 ```python
@@ -31,6 +38,12 @@ urlpatterns = [
     path("login/", views.CustomLoginView.as_view(), name="login"),
     path("profile/", views.profile_view, name="profile"),
     path("posts/", views.posts, name="posts"),
+
+    path("posts/", PostListView.as_view(), name="post-list"),
+    path("post/new/", PostCreateView.as_view(), name="post-create"),
+    path("post/<int:pk>/", PostDetailView.as_view(), name="post-detail"),
+    path("post/<int:pk>/update/", PostUpdateView.as_view(), name="post-update"),
+    path("post/<int:pk>/delete/", PostDeleteView.as_view(), name="post-delete"),
 ]
 ```
 
@@ -40,6 +53,10 @@ urlpatterns = [
 - posts.html
 - profile.html
 - register.html
+- post_confirm_delete.html
+- post_detail.html
+- post form.html
+- post_list.html
 
 ### 5.Security
 - CSRF Protection: All forms include CSRF tokens.
@@ -49,3 +66,5 @@ urlpatterns = [
 - Login Required: The profile page is protected with ```@login_required.```
 
 - Session Management: Secure session cookies prevent unauthorized access.
+
+
