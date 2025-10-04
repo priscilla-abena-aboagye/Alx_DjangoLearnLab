@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 
 class PostCRUDTests(TestCase):
     def setUp(self):
@@ -28,6 +28,24 @@ class PostCRUDTests(TestCase):
         self.client.login(username="alice", password="pass1234")
         resp = self.client.get(reverse("post-update", kwargs={"pk": self.post.pk}))
         self.assertEqual(resp.status_code, 200)
+
+    def test_post_tagging_and_search(self):
+        self.client.login(username="alice", password="pass1234")
+    # create via view or directly:
+        p = Post.objects.create(title="Django tips", content="Use QuerySet", author=self.user)
+        tag = Tag.objects.create(name="django")
+        p.tags.add(tag)
+
+    # search by tag name
+        resp = self.client.get(reverse("search"), {"q": "django"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Django tips")
+
+    # tag page
+        resp = self.client.get(reverse("posts-by-tag", kwargs={"tag_name": "django"}))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Django tips")
+
 
 class CommentTests(TestCase):
     def setUp(self):

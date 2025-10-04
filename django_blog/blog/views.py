@@ -6,8 +6,9 @@ from django.contrib.auth.views import LoginView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 from .forms import CustomUserCreationForm, ProfileForm, PostForm, CommentForm
+from django.db.models import Q
 
 
 def home(request):
@@ -70,7 +71,18 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        tags_input = form.cleaned_data.get("tags_input", "")
+        self._assign_tags(self.object, tags_input)
+        return response
+    
+    def _assign_tags(self, post, tags_input):
+        names = [n.strip() for n in tags_input.split(",") if n.strip()]
+        tags = []
+        for name in names:
+            tag, created = Tag.objects.get_or_create(name__iexact=name, defaults={"name": name})
+            tags.append(tag)
+        post.tags.set(tags) 
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -81,6 +93,20 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        tags_input = form.cleaned_data.get("tags_input", "")
+        self._assign_tags(self.object, tags_input)
+        return response
+
+    def _assign_tags(self, post, tags_input):
+        names = [n.strip() for n in tags_input.split(",") if n.strip()]
+        tags = []
+        for name in names:
+            tag, created = Tag.objects.get_or_create(name=name)
+            tags.append(tag)
+        post.tags.set(tags)
 
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -91,6 +117,23 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
+    
+def posts_by_tag(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    posts = tag.posts.all() 
+    return render(request, "blog/posts_by_tag.html", {"tag": tag, "posts": posts})
+
+# search view
+def search(request):
+    q = request.GET.get("q", "").strip()
+    results = Post.objects.none()
+    if q:
+        results = Post.objects.filter(
+            Q(title__icontains=q) |
+            Q(content__icontains=q) |
+            Q(tags__name__icontains=q)
+        ).distinct()
+    return render(request, "blog/search_results.html", {"query": q, "results": results})
 
 
 # ----------------- COMMENTS -----------------

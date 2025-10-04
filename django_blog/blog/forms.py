@@ -17,6 +17,8 @@ class ProfileForm(forms.ModelForm):
         fields = ("bio", "profile_photo")
 
 class PostForm(forms.ModelForm):
+    tags_input = forms.CharField(required=False, label="Tags (comma seperated)", help_text="Enter tags")
+
     class Meta:
         model = Post
         fields = ["title", "content"] 
@@ -24,6 +26,20 @@ class PostForm(forms.ModelForm):
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "content": forms.Textarea(attrs={"class": "form-control", "rows": 8}),
         }
+
+        def __init__(self, *args, **kwargs):
+    
+            super().__init__(*args, **kwargs)
+            if self.instance and self.instance.pk:
+                self.fields["tags_input"].initial = ", ".join(
+                    [t.name for t in self.instance.tags.all()]
+            )
+
+    def save(self, commit=True):
+        
+        post = super().save(commit=commit)
+        
+        return post
 
 class CommentForm(forms.ModelForm):
     class Meta:
