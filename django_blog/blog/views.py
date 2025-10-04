@@ -118,22 +118,32 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object()
         return post.author == self.request.user
     
-def posts_by_tag(request, tag_name):
-    tag = get_object_or_404(Tag, name=tag_name)
-    posts = tag.posts.all() 
-    return render(request, "blog/posts_by_tag.html", {"tag": tag, "posts": posts})
+class PostByTagListView(ListView):
+    model = Post
+    template_name = "blog/posts_by_tag.html"
+    context_object_name = "posts"
+    paginate_by = 10
 
-# search view
+    def get_queryset(self):
+        
+        tag_slug = self.kwargs.get("tag_slug")
+    
+        self.tag = get_object_or_404(Tag, name__iexact=tag_slug)
+        return self.tag.posts.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tag"] = self.tag
+        return context
+    
 def search(request):
-    q = request.GET.get("q", "").strip()
-    results = Post.objects.none()
-    if q:
-        results = Post.objects.filter(
-            Q(title__icontains=q) |
-            Q(content__icontains=q) |
-            Q(tags__name__icontains=q)
-        ).distinct()
-    return render(request, "blog/search_results.html", {"query": q, "results": results})
+        query = request.GET.get("q")
+        results = []
+        if query:
+            results = Post.objects.filter(
+                Q(title__icontains=query) | Q(content__icontains=query)
+        )
+        return render(request, "blog/search_result.html", {"query": query, "results": results})
 
 
 # ----------------- COMMENTS -----------------
