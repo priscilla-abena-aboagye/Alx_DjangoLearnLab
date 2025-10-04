@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.conf import settings
+from taggit.managers import TaggableManager
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -34,7 +35,7 @@ class Profile(models.Model):
     profile_photo = models.ImageField(upload_to="profile_photos/", null=True, blank=True)
 
     def __str__(self):
-        return self.username 
+        return self.user.username
 
 class Comment(models.Model):
     post = models.ForeignKey(
