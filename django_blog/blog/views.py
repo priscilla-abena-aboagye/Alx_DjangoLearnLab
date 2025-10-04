@@ -137,13 +137,16 @@ class PostByTagListView(ListView):
         return context
     
 def search(request):
-        query = request.GET.get("q")
-        results = []
-        if query:
-            results = Post.objects.filter(
-                Q(title__icontains=query) | Q(content__icontains=query)
-        )
-        return render(request, "blog/search_result.html", {"query": query, "results": results})
+    query = request.GET.get("q")
+    results = []
+    if query:
+        results = Post.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    return render(request, "blog/search_result.html", {"query": query, "results": results})
+
 
 
 # ----------------- COMMENTS -----------------
