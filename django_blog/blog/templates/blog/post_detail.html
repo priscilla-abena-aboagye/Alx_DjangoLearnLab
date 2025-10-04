@@ -17,8 +17,8 @@
         <small>By {{ comment.author.username }} — {{ comment.created_at|date:"M d, Y H:i" }}</small>
         {% if user.is_authenticated and user == comment.author %}
   
-          <a href="{% url 'comment-update' pk=post.pk comment_pk=comment.pk %}">Edit</a>
-          <a href="{% url 'comment-delete' pk=post.pk comment_pk=comment.pk %}">Delete</a>
+          <a href="{% url 'comment-update' pk=comment.pk %}">Edit</a>
+          <a href="{% url 'comment-delete' pk=comment.pk %}">Delete</a>
         {% endif %}
       </li>
     {% empty %}

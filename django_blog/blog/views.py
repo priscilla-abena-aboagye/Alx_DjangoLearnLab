@@ -115,34 +115,31 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
-    fields = ["content"]
+    form_class = CommentForm
     template_name = "blog/comment_form.html"
 
-    def get_object(self):
-        post_id = self.kwargs["pk"]
-        comment_id = self.kwargs["comment_pk"]
-        return get_object_or_404(Comment, pk=comment_id, post__pk=post_id)
+    def get_object(self, queryset=None):
+        return get_object_or_404(Comment, pk=self.kwargs["pk"])
 
     def test_func(self):
-        comment = self.get_object()
-        return self.request.user == comment.author
+        return self.request.user == self.get_object().author
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post'] = self.get_object().post
+        return context
 
-    def get_success_url(self):
-        return reverse_lazy("post-detail", kwargs={"pk": self.object.post.pk})
 
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = "blog/comment_confirm_delete.html"
 
-    def get_object(self):
-        post_id = self.kwargs["pk"]
-        comment_id = self.kwargs["comment_pk"]
-        return get_object_or_404(Comment, pk=comment_id, post__pk=post_id)
+    def get_object(self, queryset=None):
+        return get_object_or_404(Comment, pk=self.kwargs["pk"])
 
     def test_func(self):
-        comment = self.get_object()
-        return self.request.user == comment.author
+        return self.request.user == self.get_object().author
 
     def get_success_url(self):
-        return reverse_lazy("post-detail", kwargs={"pk": self.object.post.pk})
+        return reverse("post-detail", kwargs={"pk": self.get_object().post.pk})

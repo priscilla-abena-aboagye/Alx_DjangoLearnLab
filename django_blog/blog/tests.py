@@ -45,8 +45,9 @@ class CommentTests(TestCase):
     def test_only_author_can_edit_or_delete_comment(self):
         comment = Comment.objects.create(post=self.post, author=self.other, content="hey")
 
-        update_url = reverse("comment-update", kwargs={"pk": self.post.pk, "comment_pk": comment.pk})
-        delete_url = reverse("comment-delete", kwargs={"pk": self.post.pk, "comment_pk": comment.pk})
+        update_url = reverse("comment-update", kwargs={"pk": comment.pk})
+        delete_url = reverse("comment-delete", kwargs={"pk": comment.pk})
+
 
     # Alice (not author) should NOT be able to edit or delete
         self.client.login(username="alice", password="pass1234")
