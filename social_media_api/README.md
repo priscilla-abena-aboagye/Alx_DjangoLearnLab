@@ -10,3 +10,8 @@ The Social Media API serves as the backend foundation for a social networking pl
 
 ---
 
+## Features
+- Custom user authentication
+- CRUD operations for posts and comments
+- Pagination and search filtering
+- Permission enforcement (users can only edit/delete their own posts or comments)
