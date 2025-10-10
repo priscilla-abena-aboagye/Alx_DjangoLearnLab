@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from posts.serializers import PostSerializer
+from .models import CustomUser
 
 User = get_user_model()
 
@@ -33,7 +34,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "username", "email", "bio", "profile_picture", "followers_count", "following_count")
+        fields = ("id", "username", "followers_count", "following_count")
 
 class FollowSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()

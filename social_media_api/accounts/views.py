@@ -49,33 +49,34 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 class FollowAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        serializer = FollowSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user_id = serializer.validated_data["user_id"]
-        target = get_object_or_404(User, pk=user_id)
-        if request.user == target:
-            return Response({"detail": "Cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, user_id):
+        target = get_object_or_404(CustomUser, pk=user_id)
         request.user.follow(target)
-        return Response(SimpleUserSerializer(target, context={"request": request}).data, status=status.HTTP_200_OK)
+        return Response(SimpleUserSerializer(target, context={'request': request}).data, status=status.HTTP_200_OK)
 
 class UnfollowAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        serializer = FollowSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user_id = serializer.validated_data["user_id"]
-        target = get_object_or_404(User, pk=user_id)
-        if request.user == target:
-            return Response({"detail": "Cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-        request.user.unfollow(target)
-        return Response({"detail": "unfollowed"}, status=status.HTTP_200_OK)
+    def post(self, request, user_id=None):
+        target_id = user_id or request.data.get("user_id")
+        if not target_id:
+            return Response({"detail": "user_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            target_id = int(target_id)
+        except (TypeError, ValueError):
+            return Response({"detail": "Invalid user_id."}, status=status.HTTP_400_BAD_REQUEST)
 
+        target = get_object_or_404(User, pk=target_id)
+        if request.user == target:
+            return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.unfollow(target)
+        return Response({"detail": f"unfollowed {target.username}"}, status=status.HTTP_200_OK)
+    
 class FollowingListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SimpleUserSerializer
     pagination_class = None
 
     def get_queryset(self):
-        return self.request.user.following.all()
+        return self.request.user.following.all().order_by("username")
